@@ -1,0 +1,17 @@
+{
+    "iss": "https://self-issued.me",
+    "did": "",
+    "aud": "<<client_id from the request>>",
+    "nonce": "<<unique value>>",
+    "exp": 1607396967,
+    "iat": 1607396967,
+    "vp": {
+        "@context": ["https://www.w3.org/2018/credentials/v1"],
+        "type": ["VerifiablePresentation"],
+        "verifiableCredential": [
+          "<<Verifiable Credential as JWS>>",
+          "<<Verifiable Credential as JWS>>"
+        ]
+      }
+  }
+  
