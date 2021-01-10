@@ -4,7 +4,7 @@ import hashlib
 import multihash
 from jwcrypto.common import base64url_encode, base64url_decode
 
-from .did import DID, DIDPublicKey, DIDPatch, DIDUpdate, DIDSuffix, DIDPublicKeyDocumentEntry, DIDPublicKeyDocument
+from .did import DID, DIDPublicKey, DIDPatch, DIDUpdate, DIDSuffix, DIDPublicKeyDocumentEntry, DIDPublicKeyDocument, DIDLongFormSuffix
 
 class DIDService:
 
@@ -50,7 +50,7 @@ class DIDService:
             DIDPublicKey(
                 signingKeyName,
                 ['general', 'auth'],
-                "EcdsaSecp256k1VerificationKey2019",
+                "JsonWebKey2020",
                 signingKey
             ),
             DIDPublicKey(
@@ -94,11 +94,21 @@ class DIDService:
 
         suffixDataEncoded = self._base64URLEncode(suffixDataCanonical)
 
+        long_form_suffix = DIDLongFormSuffix(
+            delta,
+            suffixData
+        )
+
+        long_form_suffix_canonical = self._canonicalize(long_form_suffix.as_dict())
+        long_form_suffix_encoded = self._base64URLEncode(long_form_suffix_canonical)
+
         didShort = f'did:ion:{suffix}'
-        didLong = f'did:ion:{suffix}?-ion-initial-state={suffixDataEncoded}.{deltaEncoded}'
+        initialState = f'{suffixDataEncoded}.{deltaEncoded}'
+        didLong = f'did:ion:{suffix}:{long_form_suffix_encoded}'
 
         return DID(
             didShort,
+            initialState,
             didLong
         )
 

@@ -1,8 +1,20 @@
 
 class DID:
-    def __init__(self, shortIdentifier, longIdentifier):
+    def __init__(self, shortIdentifier, initialState, longIdentifier):
         self.shortIdentifier = shortIdentifier
+        self.initialState = initialState
         self.longIdentifier = longIdentifier
+
+class DIDLongFormSuffix:
+    def __init__(self, delta, suffix_data):
+        self.delta = delta
+        self.suffix_data = suffix_data
+
+    def as_dict(self):
+        return {
+            'delta': self.delta.as_dict(),
+            'suffix_data': self.suffix_data.as_dict()
+        }
 
 class DIDPublicKey:
     def __init__(self, key_id, purpose, key_type, jwk):

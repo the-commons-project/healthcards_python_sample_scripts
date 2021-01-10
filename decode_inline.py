@@ -4,6 +4,7 @@ from jwcrypto import jwk, jws
 from jwcrypto.common import json_encode
 import json
 import argparse
+import base64
 
 did_service = DIDService()
 
@@ -43,11 +44,19 @@ def main():
     parser.add_argument('input', help='Input resource')
     args = parser.parse_args()
 
-    decoded_vc = decode_vc(args.input)
+    try:
+        jws_raw = base64.standard_b64decode(args.input).decode(encoding='utf-8')
+        print("Base 64 decoding succeeded")
+    except:
+        print("Base 64 decoding failed, assuming input is JWS")
+        jws_raw = args.input
+
+    # print(jws_raw)
+    decoded_vc = decode_vc(jws_raw)
     payload_dict = json.loads(decoded_vc.payload)
 
     ##check that iss matches did in header
-    assert payload_dict['iss'] == get_did_from_header(args.input)
+    assert payload_dict['iss'] == get_did_from_header(jws_raw)
 
     print(json.dumps(payload_dict, indent=4))
 

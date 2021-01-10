@@ -9,10 +9,10 @@ ECEncryptionKeyName = "encryption-key-1"
 did_service = DIDService()
 
 def generate_signing_key():
-    return jwk.JWK.generate(kty='EC', crv='secp256k1')
+    return jwk.JWK.generate(kty='EC', crv='P-256', alg='ES256')
 
 def generate_encryption_key():
-    return jwk.JWK.generate(kty='EC', crv='P-256')
+    return jwk.JWK.generate(kty='EC', crv='P-256', alg='ECDH-ES')
 
 
 def main():
@@ -46,10 +46,13 @@ def main():
 
         output = {
             'did_short_identifier': did.shortIdentifier,
+            'did_initial_state': did.initialState,
             'did_long_identifier': did.longIdentifier,
             'signing_key': private_signing_key.export(as_dict=True),
+            'signing_key_json_string': json.dumps(private_signing_key.export(as_dict=True)),
             'signing_key_name': SigningKeyName,
             'encryption_key': private_encryption_key.export(as_dict=True),
+            'encryption_key_json_string': json.dumps(private_encryption_key.export(as_dict=True)),
             'encryption_key_name': ECEncryptionKeyName,
             'update_key': private_update_key.export(as_dict=True),
             'recovery_key': private_recovery_key.export(as_dict=True)

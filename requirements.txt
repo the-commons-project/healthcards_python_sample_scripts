@@ -1,4 +1,5 @@
-git+git://github.com/latchset/jwcrypto@e0249b1161cb8ef7a3a9910948103b816bc0a299
+jwcrypto
 canonicaljson
 py-multihash
 requests
+PyLD
