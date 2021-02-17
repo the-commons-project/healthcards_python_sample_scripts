@@ -3,7 +3,7 @@ import json
 import argparse
 import utils
 
-def decode_vc(jws_raw):
+def decode_vc(jws_raw, jwks_file):
 
     ## before we can verify the vc, we first need to resolve the key
     ## the key ID is stored in the header
@@ -25,9 +25,8 @@ def decode_vc(jws_raw):
 
     iss = data['iss']
     kid = unverified_headers['kid']
-
-    key = utils.resolve_key_from_issuer(iss, kid, 'ES256')
-    # key = utils.resolve_key_from_file('./jwks.json', kid, 'ES256')
+    
+    key = utils.resolve_key_from_file(jwks_file, kid, 'ES256')
 
     verified_jws = jws.verify(jws_raw, key, algorithms='ES256')
     payload = json.loads(utils.inflate(verified_jws))
@@ -36,11 +35,12 @@ def decode_vc(jws_raw):
 def main():
     parser = argparse.ArgumentParser(description='Decodes a vc')
     parser.add_argument('input_file', help='Input file')
+    parser.add_argument('jwks_file', help='JWKS file')
 
     args = parser.parse_args()
     with open(args.input_file, 'r') as input_file:
         fhir_backed_vc = json.load(input_file).get('verifiableCredential')[0]
-        payload_dict = decode_vc(fhir_backed_vc)
+        payload_dict = decode_vc(fhir_backed_vc, args.jwks_file)
 
     print(json.dumps(payload_dict, indent=4))
 
