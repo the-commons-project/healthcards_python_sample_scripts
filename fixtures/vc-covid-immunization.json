@@ -1,6 +1,6 @@
 {
   "iss": "<<URL for Issuer>>",
-  "iat": 1607396967,
+  "iat": 1611160486,
   "vc": {
     "@context": [
       "https://www.w3.org/2018/credentials/v1"
@@ -8,6 +8,7 @@
     "type": [
       "VerifiableCredential",
       "https://smarthealth.cards#health-card",
+      "https://smarthealth.cards#immunization",
       "https://smarthealth.cards#covid19"
     ],
     "credentialSubject": {
@@ -48,58 +49,64 @@
           {
             "fullUrl": "resource:1",
             "resource": {
-              "resourceType": "DiagnosticReport",
-              "status": "final",
-              "effectiveDateTime": "2020-08-10",
-              "subject": {
-                "reference": "resource:0"
-              },
-              "code": {
+              "resourceType": "Immunization",
+              "status": "completed",
+              "vaccineCode": {
                 "coding": [
                   {
-                    "system": "http://loinc.org",
-                    "code": "95423-0"
+                    "system": "http://hl7.org/fhir/sid/cvx",
+                    "code": "207"
                   }
                 ]
               },
-              "issued": "2020-08-10T11:59:00-07:00",
-              "performer": [
-                {
-                  "display": "Dr. Jones"
-                }
-              ],              
-              "result": [
-                {
-                  "reference": "resource:2"
-                }
-              ],
-              "conclusion": "No evidence of COVID-19 or Influenza infection on August 10, 2020"
+              "patient": {
+                "reference": "resource:0"
+              },
+              "occurrenceDateTime": "2021-01-01",
+              "primarySource": true,
+              "location": {
+                "reference": "resource:3"
+              },
+              "lotNumber": "Lot #0000001"
             }
           },
           {
             "fullUrl": "resource:2",
             "resource": {
-              "resourceType": "Observation",
-              "status": "final",
-              "effectiveDateTime": "2020-08-10",
-              "subject": {
+              "resourceType": "Immunization",
+              "status": "completed",
+              "vaccineCode": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/sid/cvx",
+                    "code": "207"
+                  }
+                ]
+              },
+              "patient": {
                 "reference": "resource:0"
               },
-              "code": {
-                "coding": [
-                  {
-                    "system": "http://loinc.org",
-                    "code": "95423-0"
-                  }
-                ]
+              "occurrenceDateTime": "2021-01-29",
+              "primarySource": true,
+              "location": {
+                "reference": "resource:3"
               },
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://loinc.org",
-                    "code": "LA11883-8"
-                  }
-                ]
+              "lotNumber": "Lot #0000007"
+            }
+          },
+          {
+            "fullUrl": "resource:3",
+            "resource": {
+              "resourceType": "Location",
+              "name": "ABC Pharmacy",
+              "address": {
+                "line": [
+                  "29182 South Main St NE"
+                ],
+                "postalCode": "53726",
+                "city": "Madision",
+                "state": "WI",
+                "country": "US"
               }
             }
           }
