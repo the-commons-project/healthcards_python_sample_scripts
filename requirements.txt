@@ -4,3 +4,4 @@ py-multihash
 requests
 PyLD
 python-jose[cryptography]
+qrcode[pil]

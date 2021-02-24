@@ -4,7 +4,9 @@ import time
 import secrets
 import utils
 
+
 def main():
+
     parser = argparse.ArgumentParser(description='Encodes a vc')
     parser.add_argument('private_keyset_file', help='Private keyset file')
     parser.add_argument('issuer', help='Issuer')
@@ -28,12 +30,10 @@ def main():
         payload['iat'] = now
         vc_jws = utils.encode_vc(payload, private_signing_key, kid)
 
-    ## this is the general format for a FHIR backed vc file, this is subject to change
-    with open(args.output_file, 'w') as outfile:
-        output_dict = {
-            'verifiableCredential': [vc_jws]
-        }
-        json.dump(output_dict, outfile)
+    numeric_encoded_payload = utils.encode_to_numeric(vc_jws)
+    qr_img = utils.create_qr_code(numeric_encoded_payload)
+    with open(args.output_file, 'wb') as outfile:
+        qr_img.save(outfile)
 
 if __name__ == "__main__":
     main()

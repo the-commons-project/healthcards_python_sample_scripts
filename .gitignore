@@ -143,5 +143,3 @@ cython_debug/
 save/
 myenv/
 sample_vcs/
-jwks_private.json
-jwks.json
