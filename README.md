@@ -44,4 +44,34 @@ python decode_resource.py sample_vcs/covid19.smart-health-card
 
 This script loads the VC from `sample_vcs/covid19.smart-health-card`, and verifies it based on the issuer and kid information encoded in the JWS.
 
+## Testing locally
+
+You can run a local server to serve .well-known/jwks.json.
+
+Use the following commands:
+
+```
+python generate_random_jwks.py .well-known/jwks.json jwks_private.json
+python encode_resource.py jwks_private.json http://localhost:8080 fixtures/vc-c19-pcr-jwt-payload.json sample_vcs/lab_result.smart-health-card
+```
+
+Then, start running a local server:
+
+```
+python -m http.server 8080
+```
+
+Finally, verify the VC using the following command:
+```
+python decode_resource.py sample_vcs/lab_result.smart-health-card
+```
+
+Additionally, you can test QR code generation with the sample QR code scanning app and a locally running verifier service using the following command to generate a QR code:
+
+```
+python encode_resource_in_qr_code.py jwks_private.json http://host.docker.internal:8080 fixtures/vc-c19-pcr-jwt-payload.json sample_vcs/lab_result.png
+```
+
+This sets the issuer to `http://host.docker.internal:8080`, which allows the sample verifier app to resolve port 8080 on the host during verification.
+
 

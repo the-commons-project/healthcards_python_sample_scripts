@@ -143,5 +143,6 @@ cython_debug/
 save/
 myenv/
 sample_vcs/
+fixtures/commonpass-payload.json
+.well-known/jwks.json
 jwks_private.json
-jwks.json
