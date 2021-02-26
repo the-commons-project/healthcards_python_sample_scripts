@@ -143,3 +143,4 @@ cython_debug/
 save/
 myenv/
 sample_vcs/
+fixtures/commonpass-payload.json
