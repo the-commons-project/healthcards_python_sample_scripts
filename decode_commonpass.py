@@ -11,11 +11,10 @@ def main():
     numeric_payload = args.input.split('#')[1]
 
     input_jwt = utils.decode_from_numeric(numeric_payload)
-    print(input_jwt)
 
-    # payload = input_jwt.split('.')[1]
-    # payload_string = base64.standard_b64decode(payload).decode(encoding='utf-8')
-    # print(payload_string)
+    payload_dict = utils.decode_vc(input_jwt, verify=False)
+
+    print(json.dumps(payload_dict, indent=4))
 
 if __name__ == "__main__":
     main()

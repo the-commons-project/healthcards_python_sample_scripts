@@ -130,9 +130,15 @@ def _decode_vc(jws_raw, key_resolver):
     payload = json.loads(inflate(verified_jws))
     return payload
 
-def decode_vc(jws_raw):
-    resolver = resolve_key_from_issuer()
-    return _decode_vc(jws_raw, resolver)
+def decode_vc(jws_raw, verify=True):
+    if verify:
+        resolver = resolve_key_from_issuer()
+        return _decode_vc(jws_raw, resolver)
+    else:
+        verified_jws = jws.verify(jws_raw, "", algorithms='None', verify=False)
+        payload = json.loads(inflate(verified_jws))
+        return payload
+
 
 def decode_vc_from_local_issuer(jws_raw, jwks_file):
     resolver = resolve_key_from_file(jwks_file)
