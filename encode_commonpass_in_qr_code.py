@@ -10,6 +10,7 @@ def main():
     parser = argparse.ArgumentParser(description='Encodes a vc')
     parser.add_argument('private_keyset_file', help='Private keyset file')
     parser.add_argument('issuer', help='Issuer')
+    parser.add_argument('url', help='URL')
     parser.add_argument('input_file', help='Sample VC fixture file')
     parser.add_argument('output_file', help='Output file')
 
@@ -31,7 +32,7 @@ def main():
         vc_jws = utils.encode_vc(payload, private_signing_key, kid)
 
     numeric_encoded_payload = utils.encode_to_numeric(vc_jws)
-    qr_img = utils.create_shc_qr_code(numeric_encoded_payload)
+    qr_img = utils.create_cp_qr_code(args.url, numeric_encoded_payload)
     with open(args.output_file, 'wb') as outfile:
         qr_img.save(outfile)
 

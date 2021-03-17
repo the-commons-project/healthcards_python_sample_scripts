@@ -16,7 +16,7 @@ def main():
         fhir_backed_vc = json.load(input_file).get('verifiableCredential')[0]
 
     numeric_encoded_payload = utils.encode_to_numeric(fhir_backed_vc)
-    qr_img = utils.create_qr_code(numeric_encoded_payload)
+    qr_img = utils.create_shc_qr_code(numeric_encoded_payload)
     with open(args.output_file, 'wb') as outfile:
         qr_img.save(outfile)
 
