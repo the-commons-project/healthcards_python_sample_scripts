@@ -130,9 +130,15 @@ def _decode_vc(jws_raw, key_resolver):
     payload = json.loads(inflate(verified_jws))
     return payload
 
-def decode_vc(jws_raw):
-    resolver = resolve_key_from_issuer()
-    return _decode_vc(jws_raw, resolver)
+def decode_vc(jws_raw, verify=True):
+    if verify:
+        resolver = resolve_key_from_issuer()
+        return _decode_vc(jws_raw, resolver)
+    else:
+        verified_jws = jws.verify(jws_raw, "", algorithms='None', verify=False)
+        payload = json.loads(inflate(verified_jws))
+        return payload
+
 
 def decode_vc_from_local_issuer(jws_raw, jwks_file):
     resolver = resolve_key_from_file(jwks_file)
@@ -153,8 +159,51 @@ def encode_char_to_numeric(ch):
 def encode_to_numeric(payload):
     return ''.join([encode_char_to_numeric(ch) for ch in payload])
 
-def create_qr_code(numeric_encoded_payload):
-    qr = qrcode.QRCode()
-    qr.add_data(SMART_HEALTH_CARD_PREFIX)
-    qr.add_data(numeric_encoded_payload)
+def decode_from_numeric(numeric):
+    if len(numeric) % 2 != 0:
+        raise Exception("uneven string") 
+
+    pair_count = int(len(numeric) / 2)
+    chars = []
+    for i in range(pair_count):
+        
+        offset = i * 2
+        pair = numeric[offset:offset+2]
+        
+        try:
+            int_value = int(pair)
+        except BaseException as e:
+            print(i)
+            print(pair)
+            raise e
+
+        # print(int_value)
+        ch = chr(int_value + SMALLEST_B64_CHAR_CODE)
+        # print(ch)
+        chars.append(ch)
+
+    return ''.join(chars)
+
+
+def create_shc_qr_code(numeric_encoded_payload):
+    qr = qrcode.QRCode(
+        error_correction=qrcode.constants.ERROR_CORRECT_L
+    )
+    qr.add_data(SMART_HEALTH_CARD_PREFIX, optimize=0)
+    qr.add_data(numeric_encoded_payload, optimize=0)
+    version = qr.best_fit()
+    print(f'The QR Version is {version}')
+    return qr.make_image(fill_color="black", back_color="white")
+
+def create_cp_qr_code(url, numeric_encoded_payload):
+    print(numeric_encoded_payload)
+    qr = qrcode.QRCode(
+        error_correction=qrcode.constants.ERROR_CORRECT_L
+    )
+    qr.add_data(url.upper())
+    qr.add_data('#')
+    qr.add_data(numeric_encoded_payload, optimize=0)
+    version = qr.best_fit()
+    print(f'The QR Version is {version}')
+    # qr.make(fit=False)
     return qr.make_image(fill_color="black", back_color="white")
