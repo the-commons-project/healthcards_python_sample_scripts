@@ -1,8 +1,10 @@
+#!/usr/bin/env python
 import argparse
 import json
 import time
 import secrets
-import utils
+import shc.utils
+
 
 def main():
     parser = argparse.ArgumentParser(description='Encodes a vc')
@@ -21,19 +23,20 @@ def main():
     with open(args.input_file, 'r') as input_file:
         payload = json.load(input_file)
 
-        ##since we're using a static file to form the payload
-        ## it needs to be modified a bit
+        # since we're using a static file to form the payload
+        # it needs to be modified a bit
         now = int(time.time())
         payload['iss'] = args.issuer
         payload['iat'] = now
         vc_jws = utils.encode_vc(payload, private_signing_key, kid)
 
-    ## this is the general format for a FHIR backed vc file, this is subject to change
+    # this is the general format for a FHIR backed vc file, this is subject to change
     with open(args.output_file, 'w') as outfile:
         output_dict = {
             'verifiableCredential': [vc_jws]
         }
         json.dump(output_dict, outfile)
+
 
 if __name__ == "__main__":
     main()

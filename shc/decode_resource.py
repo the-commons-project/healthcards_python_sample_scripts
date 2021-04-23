@@ -1,6 +1,8 @@
+#!/usr/bin/env python
 import json
 import argparse
-import utils
+import shc.utils
+
 
 def main():
     parser = argparse.ArgumentParser(description='Decodes a vc')
@@ -12,6 +14,7 @@ def main():
         payload_dict = utils.decode_vc(fhir_backed_vc)
 
     print(json.dumps(payload_dict, indent=4))
+
 
 if __name__ == "__main__":
     main()

@@ -1,22 +1,27 @@
+#!/usr/bin/env python
 from jwcrypto import jwk
 import argparse
 import json
+
 
 def generate_signing_key():
     key = jwk.JWK.generate(kty='EC', crv='P-256', alg='ES256', use='sig')
     key._params['kid'] = key.thumbprint()
     return key
 
+
 def generate_encryption_key():
     key = jwk.JWK.generate(kty='EC', crv='P-256', alg='ECDH-ES', use='enc')
     key._params['kid'] = key.thumbprint()
     return key
+
 
 def generate_keyset(keys):
     keyset = jwk.JWKSet()
     for key in keys:
         keyset.add(key)
     return keyset
+
 
 def main():
 
@@ -34,6 +39,7 @@ def main():
         json.dump(keyset.export(private_keys=True, as_dict=True), private_file, indent=4)
     with open(args.public_file, 'w', newline='') as public_file:
         json.dump(keyset.export(private_keys=False, as_dict=True), public_file, indent=4)
+
 
 if __name__ == "__main__":
     main()

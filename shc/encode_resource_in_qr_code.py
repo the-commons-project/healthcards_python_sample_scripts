@@ -1,8 +1,9 @@
+#!/usr/bin/env python
 import argparse
 import json
 import time
 import secrets
-import utils
+import shc.utils
 
 
 def main():
@@ -23,8 +24,8 @@ def main():
     with open(args.input_file, 'r') as input_file:
         payload = json.load(input_file)
 
-        ##since we're using a static file to form the payload
-        ## it needs to be modified a bit
+        # since we're using a static file to form the payload
+        # it needs to be modified a bit
         now = int(time.time())
         payload['iss'] = args.issuer
         payload['iat'] = now
@@ -34,6 +35,7 @@ def main():
     qr_img = utils.create_qr_code(numeric_encoded_payload)
     with open(args.output_file, 'wb') as outfile:
         qr_img.save(outfile)
+
 
 if __name__ == "__main__":
     main()
