@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import zlib
 import requests
 from jose import jwk as jose_jwk, jws
@@ -9,32 +10,35 @@ sample_numeric_encoded_payload = "5676290952432060346029243740446031222959532654
 SMALLEST_B64_CHAR_CODE = ord('-')
 SMART_HEALTH_CARD_PREFIX = 'shc:/'
 
-## https://stackoverflow.com/a/1089787
+# https://stackoverflow.com/a/1089787
+
+
 def deflate(data, compresslevel=9):
     compress = zlib.compressobj(
         compresslevel,        # level: 0-9
         zlib.DEFLATED,        # method: must be DEFLATED
         -zlib.MAX_WBITS,      # window size in bits:
-                                #   -15..-8: negate, suppress header
-                                #   8..15: normal
-                                #   16..30: subtract 16, gzip header
+        #   -15..-8: negate, suppress header
+        #   8..15: normal
+        #   16..30: subtract 16, gzip header
         zlib.DEF_MEM_LEVEL,   # mem level: 1..8/9
         0                     # strategy:
-                                #   0 = Z_DEFAULT_STRATEGY
-                                #   1 = Z_FILTERED
-                                #   2 = Z_HUFFMAN_ONLY
-                                #   3 = Z_RLE
-                                #   4 = Z_FIXED
+        #   0 = Z_DEFAULT_STRATEGY
+        #   1 = Z_FILTERED
+        #   2 = Z_HUFFMAN_ONLY
+        #   3 = Z_RLE
+        #   4 = Z_FIXED
     )
     deflated = compress.compress(data)
     deflated += compress.flush()
     return deflated
 
+
 def inflate(data):
-    ## needed to add `-zlib.MAX_WBITS` here due to 
-    ## zlib.error: Error -3 while decompressing data: incorrect header check
+    # needed to add `-zlib.MAX_WBITS` here due to
+    # zlib.error: Error -3 while decompressing data: incorrect header check
     decompress = zlib.decompressobj(
-            -zlib.MAX_WBITS  # see above
+        -zlib.MAX_WBITS  # see above
     )
     inflated = decompress.decompress(data)
     inflated += decompress.flush()
@@ -54,7 +58,7 @@ def resolve_key_from_issuer():
                 return key
                 # TODO - the following line causes an exception to occur during verficiation
                 # There's a fix on master for this, but for now, it does not work
-                # 
+                #
                 #   File "/usr/local/lib/python3.7/site-packages/jose/jws.py", line 233, in _get_keys
                 #       if 'keys' in key:
                 # TypeError: argument of type 'CryptographyECKey' is not iterable
@@ -63,6 +67,7 @@ def resolve_key_from_issuer():
         raise Exception(f'Key with kid = {kid} not found')
 
     return resolve
+
 
 def resolve_key_from_file(jwks_filename):
     def resolve(iss, kid, algorithm):
@@ -74,7 +79,7 @@ def resolve_key_from_file(jwks_filename):
                 return key
                 # TODO - the following line causes an exception to occur during verficiation
                 # There's a fix on master for this, but for now, it does not work
-                # 
+                #
                 #   File "/usr/local/lib/python3.7/site-packages/jose/jws.py", line 233, in _get_keys
                 #       if 'keys' in key:
                 # TypeError: argument of type 'CryptographyECKey' is not iterable
@@ -83,6 +88,7 @@ def resolve_key_from_file(jwks_filename):
         raise Exception(f'Key with kid = {kid} not found')
 
     return resolve
+
 
 def load_private_key_from_file(jwks_filename, use, algorithm):
     with open(jwks_filename, 'r', newline='') as jwks_file:
@@ -93,7 +99,7 @@ def load_private_key_from_file(jwks_filename, use, algorithm):
             return (key.get('kid'), key)
             # TODO - the following line causes an exception to occur during verficiation
             # There's a fix on master for this, but for now, it does not work
-            # 
+            #
             #   File "/usr/local/lib/python3.7/site-packages/jose/jws.py", line 233, in _get_keys
             #       if 'keys' in key:
             # TypeError: argument of type 'CryptographyECKey' is not iterable
@@ -102,18 +108,19 @@ def load_private_key_from_file(jwks_filename, use, algorithm):
 
     raise Exception(f'Key with use = {use} algorithm = {algorithm} not found')
 
+
 def _decode_vc(jws_raw, key_resolver):
-    ## before we can verify the vc, we first need to resolve the key
-    ## the key ID is stored in the header
-    ## Per the health cards IG,
+    # before we can verify the vc, we first need to resolve the key
+    # the key ID is stored in the header
+    # Per the health cards IG,
     ## "Issuers SHALL publish keys as JSON Web Key Sets (see RFC7517), available at <<iss value from Signed JWT>> + .well-known/jwks.json"
-    ## therefore, we need decode the claims to get the iss value in order to resolve the key
-    ## The claims are compressed via Deflate, so decompress the data
-    ## then, extract the iss claim to get access to the base URL, use that to resolve key with id = kid
-    ## then, verify the jws
+    # therefore, we need decode the claims to get the iss value in order to resolve the key
+    # The claims are compressed via Deflate, so decompress the data
+    # then, extract the iss claim to get access to the base URL, use that to resolve key with id = kid
+    # then, verify the jws
     unverified_headers = jws.get_unverified_headers(jws_raw)
 
-    ## we expect data to be zipped, so deflate the data
+    # we expect data to be zipped, so deflate the data
     if unverified_headers.get('zip') == 'DEF':
         unverfied_claims_zip = jws.get_unverified_claims(jws_raw)
         raw_data = inflate(unverfied_claims_zip)
@@ -123,20 +130,23 @@ def _decode_vc(jws_raw, key_resolver):
 
     iss = data['iss']
     kid = unverified_headers['kid']
-    
+
     key = key_resolver(iss, kid, 'ES256')
 
     verified_jws = jws.verify(jws_raw, key, algorithms='ES256')
     payload = json.loads(inflate(verified_jws))
     return payload
 
+
 def decode_vc(jws_raw):
     resolver = resolve_key_from_issuer()
     return _decode_vc(jws_raw, resolver)
 
+
 def decode_vc_from_local_issuer(jws_raw, jwks_file):
     resolver = resolve_key_from_file(jwks_file)
     return _decode_vc(jws_raw, resolver)
+
 
 def encode_vc(payload, private_signing_key, kid):
 
@@ -146,12 +156,15 @@ def encode_vc(payload, private_signing_key, kid):
     headers = {"kid": kid, 'zip': 'DEF'}
     return jws.sign(compressed_payload, private_signing_key, headers=headers, algorithm='ES256')
 
+
 def encode_char_to_numeric(ch):
     numeric_value = ord(ch) - SMALLEST_B64_CHAR_CODE
     return '%02d' % (numeric_value)
 
+
 def encode_to_numeric(payload):
     return ''.join([encode_char_to_numeric(ch) for ch in payload])
+
 
 def create_qr_code(numeric_encoded_payload):
     qr = qrcode.QRCode()

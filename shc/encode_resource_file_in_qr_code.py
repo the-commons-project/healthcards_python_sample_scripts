@@ -1,8 +1,9 @@
+#!/usr/bin/env python
 import argparse
 import json
 import time
 import secrets
-import utils
+import shc.utils
 
 
 def main():
@@ -19,6 +20,7 @@ def main():
     qr_img = utils.create_qr_code(numeric_encoded_payload)
     with open(args.output_file, 'wb') as outfile:
         qr_img.save(outfile)
+
 
 if __name__ == "__main__":
     main()
