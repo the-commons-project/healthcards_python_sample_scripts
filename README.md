@@ -1,5 +1,7 @@
 # HealthCards Sample Scripts for Python
 
+**Please note that these scripts are for demonstrational purposes only. These have not been tested and should not be used directly in production.**
+
 ## Installation
 
 Run the `install.sh` script in this directory. 
