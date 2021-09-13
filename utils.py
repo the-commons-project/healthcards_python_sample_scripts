@@ -181,18 +181,18 @@ def decode_from_numeric(numeric):
     return ''.join(chars)
 
 def create_shc_qr_code(numeric_encoded_payload):
-    print(numeric_encoded_payload)
+    print(f'The numeric string is {len(numeric_encoded_payload)} characters long')
     qr = qrcode.QRCode(
         error_correction=qrcode.constants.ERROR_CORRECT_L
     )
     qr.add_data(SMART_HEALTH_CARD_PREFIX, optimize=0)
     qr.add_data(numeric_encoded_payload, optimize=0)
     version = qr.best_fit()
-    print(f'The QR Version is {version}')
+    print(f'The QR Version is v{version}')
     return qr.make_image(fill_color="black", back_color="white")
 
 def create_cp_qr_code(url, numeric_encoded_payload):
-    print(numeric_encoded_payload)
+    print(f'The numeric string is {len(numeric_encoded_payload)} characters long')
     qr = qrcode.QRCode(
         error_correction=qrcode.constants.ERROR_CORRECT_L
     )
@@ -200,11 +200,11 @@ def create_cp_qr_code(url, numeric_encoded_payload):
     qr.add_data('#')
     qr.add_data(numeric_encoded_payload, optimize=0)
     version = qr.best_fit()
-    print(f'The QR Version is {version}')
+    print(f'The QR Version is v{version}')
     return qr.make_image(fill_color="black", back_color="white")
 
 def create_qr_code_from_numeric(numeric_encoded_payload):
-    print(numeric_encoded_payload)
+    print(f'The numeric string is {len(numeric_encoded_payload)} characters long')
     qr = qrcode.QRCode(
         error_correction=qrcode.constants.ERROR_CORRECT_L
     )
@@ -215,15 +215,16 @@ def create_qr_code_from_numeric(numeric_encoded_payload):
 
     m = SMART_HEALTH_CARD_MULTI_PREFIX_RE.match(numeric_encoded_payload)
     if m:
-        print('matched!!')
-        print(m)
-        print(m.group())
-        qr.add_data(m.group(), optimize=0)
+        # print('matched!!')
+        # print(m)
+        # print(m.group())
+        # qr.add_data(m.group(), optimize=0)
         numeric_encoded_payload = numeric_encoded_payload[m.end():]
     else:
-        print('Did not match!!')  
+        # print('Did not match!!')  
+        pass
 
     qr.add_data(numeric_encoded_payload, optimize=0)
     version = qr.best_fit()
-    print(f'The QR Version is {version}')
+    print(f'The QR Version is v{version}')
     return qr.make_image(fill_color="black", back_color="white")
