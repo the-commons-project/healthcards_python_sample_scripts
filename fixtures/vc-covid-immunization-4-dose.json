@@ -82,6 +82,60 @@
               ],
               "lotNumber": "0000007"
             }
+          },
+          {
+            "fullUrl": "resource:3",
+            "resource": {
+              "resourceType": "Immunization",
+              "status": "completed",
+              "vaccineCode": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/sid/cvx",
+                    "code": "207"
+                  }
+                ]
+              },
+              "patient": {
+                "reference": "resource:0"
+              },
+              "occurrenceDateTime": "2021-07-29",
+              "performer": [
+                {
+                  "actor": {
+                    "display": "ABC General Hospital"
+                  }
+                }
+              ],
+              "lotNumber": "0000105"
+            }
+          },
+          {
+            "fullUrl": "resource:4",
+            "resource": {
+              "resourceType": "Immunization",
+              "status": "completed",
+              "vaccineCode": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/sid/cvx",
+                    "code": "207"
+                  }
+                ]
+              },
+              "patient": {
+                "reference": "resource:0"
+              },
+              "occurrenceDateTime": "2021-11-29",
+              "performer": [
+                {
+                  "actor": {
+                    "display": "ABC General Hospital"
+                  }
+                }
+              ],
+              "lotNumber": "08sdf001"
+            }
           }
         ]
       }

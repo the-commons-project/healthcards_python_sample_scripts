@@ -25,7 +25,7 @@ def main():
         ## it needs to be modified a bit
         now = int(time.time())
         payload['iss'] = args.issuer
-        payload['iat'] = now
+        payload['nbf'] = now
         vc_jws = utils.encode_vc(payload, private_signing_key, kid)
 
     ## this is the general format for a FHIR backed vc file, this is subject to change

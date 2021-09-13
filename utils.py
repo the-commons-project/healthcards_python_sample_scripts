@@ -3,11 +3,13 @@ import requests
 from jose import jwk as jose_jwk, jws
 import json
 import qrcode
+import re
 
 sample_payload = "eyJ6aXAiOiJERUYiLCJhbGciOiJFUzI1NiIsImtpZCI6IjNLZmRnLVh3UC03Z1h5eXd0VWZVQUR3QnVtRE9QS01ReC1pRUxMMTFXOXMifQ.3VRNT9swGP4rkbmmTZxQSnIaZZPWCRBSy3aYOLiOSbw5duSPlq7qf99rp4FOg952WW62Xz_v8-E3O8SNQSVqrO1MmSQUF2NKdGUS2HdMoxhxYlGJJwVO82lxnsZoTVG5Qx-okpY9w9n3l9ubzWa8ycdK10mW4suEalYxaTkRJllj9Bgju-2Yv_GVaf7EyUqw65ca6DUAmZZo2zAibNPTOaNqzStcnKzpFyO_OFnH29ZJ_otYrqQn9Upz4VY_GLVe31PDNbA0vqZE5-N0jAHU786crATzNZoZ5TRly6AKHQ4GlYgqIQDNI8QIGugtSAdkJ8SDFlAw3C9TKBgWbwDfA1W471GeLZM9J0ByAWUQWnPbuNWYqjZZaiJNRzRc-hyUJ5dpOrrIR_nIamcsWPLz7B7w1kQ4dq2q0AWjPbghSct6nqTlAiijKwk0tAkyar5mvjn6ohpJbEP85ozXtWDGKhnN53P06GFqJit4PyVqSfBkxSGFj8T6TriY4FGKR5nXTaoK5JrQslPGEnHgg7P8fAIFVLneO_SwAIb7ffymh_i0h_Pj0GMEfawzIaS2E8yyKrhBKZcHP3ZwVHFZB2JmayxrD2aD142Yhmfu30NieJXQ9XOgGphn6dQTjVF3CC7QeWKQh-d2nDsUKUqdDkfeniVve4gsWJR6WZ3mkNh2cdAGEbIYCUV7Me-B5x5cKHvn2lVI4kbZ6CwNH0T9jo3Zf2ljVvwTG6fv2piftvFm6DrMG7qaXUf3DdEtodvjqdghAV76icsKfJlFwN420S3hMlrY6O6T_4H9MTaTfJpdeBO59TNzSypuXsPyFd_mf03V3s_Vfv8b.6RJ6ZFwPRqsVdDXsEUaDhkRo0u3nKC1cSCgN7YyPM1tteqPziRNbEkMdvURrkZ3baECxqmDybQvpGKVmEorTNw"
 sample_numeric_encoded_payload = "5676290952432060346029243740446031222959532654603460292540772804336028702864716745222809286133314564376531415906402203064504590856435503414245413640370636654171372412363803043756220467374075323239254334433260573601064137333912707426350769625364643945753638652852454535422237213876065244343160343853740855723835636810685712126967072534581208054242090543775073110024063411383336384168693404326438364025053330552640380527553266755975446326292974413411056375657045663941260836750066626744127412650663127253774252117654553004036442077072245263447552396237296363611221586172000544735026415257102476406874090854520923402064454566057720605333353934523368773871546530776725763450342565270512452950667144696836651240677707414450263141560604352333532003736845240800330361202740101109546920397733456645083937637609203027360726634458682836233328113628267258713820556229113823256320740622123930215842537423572004420710042656314532122903217620424036426535537233424468614545526029333777375400597640290855673469692837506528526454704235317710211074046236075568056803204261355358593854710965683963206060613074620371206276526908647361650966596729532435110866774371422326305965330806350309262568296071073576416838572162753826256111390939696044072526303708654339526630082969367063352624652758581035115720282541316556345038742028531057577664595060035950356103263224575274772852380524117676306959213045542735064574412725452105296452767569230552230407054459645772060333605629433612433458266759650955363961412506222210365642303659005505652370403040685523625756656041735607587042293709424506646233590554552026245328442240411032560021087508543027736505634128076253450922743327033912616606455705636141737439260957730567605771732564092369322610685243405706235524716655736168555859204110096054703057296325743307050338065932636944093409395007271232395239572967555621340812393377387667724370357625555064570306410670504157731153010937290945257435376870415523437024405223596237660372066530220454382258331044763532047171566835776037335324623255734037696245065352242275686423765336736726304164246669393374"
 SMALLEST_B64_CHAR_CODE = ord('-')
 SMART_HEALTH_CARD_PREFIX = 'shc:/'
+SMART_HEALTH_CARD_MULTI_PREFIX_RE = re.compile('^\d+/\d+/')
 
 ## https://stackoverflow.com/a/1089787
 def deflate(data, compresslevel=9):
@@ -153,8 +155,76 @@ def encode_char_to_numeric(ch):
 def encode_to_numeric(payload):
     return ''.join([encode_char_to_numeric(ch) for ch in payload])
 
-def create_qr_code(numeric_encoded_payload):
-    qr = qrcode.QRCode()
-    qr.add_data(SMART_HEALTH_CARD_PREFIX)
-    qr.add_data(numeric_encoded_payload)
+def decode_from_numeric(numeric):
+    if len(numeric) % 2 != 0:
+        raise Exception("uneven string") 
+
+    pair_count = int(len(numeric) / 2)
+    chars = []
+    for i in range(pair_count):
+        
+        offset = i * 2
+        pair = numeric[offset:offset+2]
+        
+        try:
+            int_value = int(pair)
+        except BaseException as e:
+            print(i)
+            print(pair)
+            raise e
+
+        # print(int_value)
+        ch = chr(int_value + SMALLEST_B64_CHAR_CODE)
+        # print(ch)
+        chars.append(ch)
+
+    return ''.join(chars)
+
+def create_shc_qr_code(numeric_encoded_payload):
+    print(f'The numeric string is {len(numeric_encoded_payload)} characters long')
+    qr = qrcode.QRCode(
+        error_correction=qrcode.constants.ERROR_CORRECT_L
+    )
+    qr.add_data(SMART_HEALTH_CARD_PREFIX, optimize=0)
+    qr.add_data(numeric_encoded_payload, optimize=0)
+    version = qr.best_fit()
+    print(f'The QR Version is v{version}')
+    return qr.make_image(fill_color="black", back_color="white")
+
+def create_cp_qr_code(url, numeric_encoded_payload):
+    print(f'The numeric string is {len(numeric_encoded_payload)} characters long')
+    qr = qrcode.QRCode(
+        error_correction=qrcode.constants.ERROR_CORRECT_L
+    )
+    qr.add_data(url.upper())
+    qr.add_data('#')
+    qr.add_data(numeric_encoded_payload, optimize=0)
+    version = qr.best_fit()
+    print(f'The QR Version is v{version}')
+    return qr.make_image(fill_color="black", back_color="white")
+
+def create_qr_code_from_numeric(numeric_encoded_payload):
+    print(f'The numeric string is {len(numeric_encoded_payload)} characters long')
+    qr = qrcode.QRCode(
+        error_correction=qrcode.constants.ERROR_CORRECT_L
+    )
+
+    if numeric_encoded_payload.startswith(SMART_HEALTH_CARD_PREFIX):
+        numeric_encoded_payload = numeric_encoded_payload.replace(SMART_HEALTH_CARD_PREFIX, '')
+        qr.add_data(SMART_HEALTH_CARD_PREFIX, optimize=0)
+
+    m = SMART_HEALTH_CARD_MULTI_PREFIX_RE.match(numeric_encoded_payload)
+    if m:
+        # print('matched!!')
+        # print(m)
+        # print(m.group())
+        # qr.add_data(m.group(), optimize=0)
+        numeric_encoded_payload = numeric_encoded_payload[m.end():]
+    else:
+        # print('Did not match!!')  
+        pass
+
+    qr.add_data(numeric_encoded_payload, optimize=0)
+    version = qr.best_fit()
+    print(f'The QR Version is v{version}')
     return qr.make_image(fill_color="black", back_color="white")
