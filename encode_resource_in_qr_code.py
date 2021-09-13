@@ -27,11 +27,11 @@ def main():
         ## it needs to be modified a bit
         now = int(time.time())
         payload['iss'] = args.issuer
-        payload['iat'] = now
+        payload['nbf'] = now
         vc_jws = utils.encode_vc(payload, private_signing_key, kid)
 
     numeric_encoded_payload = utils.encode_to_numeric(vc_jws)
-    qr_img = utils.create_qr_code(numeric_encoded_payload)
+    qr_img = utils.create_shc_qr_code(numeric_encoded_payload)
     with open(args.output_file, 'wb') as outfile:
         qr_img.save(outfile)
 
