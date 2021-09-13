@@ -146,3 +146,4 @@ sample_vcs/
 fixtures/commonpass-payload.json
 .well-known/jwks.json
 jwks_private.json
+qr_codes_for_testing/
