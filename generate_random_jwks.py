@@ -4,12 +4,12 @@ import json
 
 def generate_signing_key():
     key = jwk.JWK.generate(kty='EC', crv='P-256', alg='ES256', use='sig')
-    key._params['kid'] = key.thumbprint()
+    key.setdefault("kid",key.thumbprint())
     return key
 
 def generate_encryption_key():
     key = jwk.JWK.generate(kty='EC', crv='P-256', alg='ECDH-ES', use='enc')
-    key._params['kid'] = key.thumbprint()
+    key.setdefault("kid",key.thumbprint())
     return key
 
 def generate_keyset(keys):
