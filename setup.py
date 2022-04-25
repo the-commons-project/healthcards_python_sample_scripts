@@ -72,9 +72,9 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
 
 setup(
     name="shc",
-    version="0.0.3",
+    version="0.0.4",
     description="SMART Health Card Tools",
-    long_description="""A collection of scripts and utilitews for working with SMART Health Cards on the command line and in Python.""",
+    long_description="""A collection of scripts and utilites for working with SMART Health Cards on the command line and in Python.""",
     author="James Kizer, Alan Viars",
     author_email="sales@videntity.com",
     url="https://github.com/TransparentHealth/healthcards_python_sample_scripts",
