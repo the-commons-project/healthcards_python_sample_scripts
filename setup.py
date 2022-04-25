@@ -72,15 +72,15 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
 
 setup(
     name="shc",
-    version="0.0.1",
+    version="0.0.3",
     description="SMART Health Card Tools",
-    long_description="""A collection of scripts for working with SMART Health Cards.""",
-    author="James Kizer",
+    long_description="""A collection of scripts and utilitews for working with SMART Health Cards on the command line and in Python.""",
+    author="James Kizer, Alan Viars",
     author_email="sales@videntity.com",
     url="https://github.com/TransparentHealth/healthcards_python_sample_scripts",
     download_url="https://github.com/TransparentHealth/healthcards_python_sample_scripts/tarball/master",
     install_requires=[
-        'jwcrypto', 'canonicaljson', 'requests', 'py-multihash', 'PyLD', 'python-jose[cryptography]'
+        'jwcrypto', 'canonicaljson', 'requests', 'py-multihash', 'PyLD', 'python-jose[cryptography]', 'qrcode[pil]'
     ],
     packages=['shc',],
     scripts=[
